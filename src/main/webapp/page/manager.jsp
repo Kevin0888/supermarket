@@ -11,7 +11,9 @@
 </head>
 <script type="text/javascript" src="${pageContext.request.contextPath}/component/jquery-3.3.1.min.js"></script>
 <script type="text/javascript">
+
     function to_add_member() {
+        $("#manager_fm").attr('action', '/supermarket/addMember.htm');
         $("#manager_fm").submit();
     }
 </script>
@@ -20,7 +22,7 @@
     <h1>会员管理</h1>
     <hr>
 </div>
-<form id="manager_fm" action="${pageContext.request.contextPath}/supermarket/addMember.htm" method="post">
+<form id="manager_fm"  method="post">
     <div id="add_member" align="center">
         <label>会员卡号</label><input type="text" id="member_id" name="id"/>
         <label>姓&#12288&#12288名</label><input type="text" id="member_name" name="name"/>
@@ -31,7 +33,7 @@
         <label>余&#12288&#12288额</label><input type="text" id="total" name="total"/>
         <br>
         <br>
-        <input type="submit" id="add_btn" value="添加"/>
+        <input type="button" id="add_btn" value="添加" onclick="to_add_member()"/>
         <input type="button" id="cancel_btn" value="取消" onclick=""/>
         <br>
         <hr>

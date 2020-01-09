@@ -13,7 +13,6 @@
     <title>cashier</title>
 </head>
 <script type="text/javascript" src="${pageContext.request.contextPath}/component/jquery-3.3.1.min.js"></script>
-<%--<script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.min.js"></script>--%>
 <script type="text/javascript">
 
 
@@ -30,7 +29,7 @@
             return;
         }
 
-        $("#cashier_fm").attr('action', '/supermarket/addCommodity');
+        $("#cashier_fm").attr('action', '/supermarket/addCommodity.htm');
         $("#cashier_fm").submit();
     };
 
@@ -42,7 +41,7 @@
             return;
         }
 
-        $("#cashier_fm").attr('action', '/supermarket/removeCommodity');
+        $("#cashier_fm").attr('action', '/supermarket/removeCommodity.htm');
         $("#cashier_fm").submit();
     };
 
@@ -67,7 +66,7 @@
             alert("收到现金额度有误，请查验");
             return;
         }
-        $("#cashier_fm").attr('action', '/supermarket/checkoutByCash');
+        $("#cashier_fm").attr('action', '/supermarket/checkoutByCash.htm');
         $("#cashier_fm").submit();
     }
 
@@ -83,7 +82,7 @@
             alert("余额不足，请及时充值");
             return;
         }
-        $("#cashier_fm").attr('action', '/supermarket/checkoutByMember');
+        $("#cashier_fm").attr('action', '/supermarket/checkoutByMember.htm');
         $("#cashier_fm").submit();
     }
 

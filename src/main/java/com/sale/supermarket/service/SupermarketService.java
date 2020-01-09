@@ -5,7 +5,6 @@ import com.sale.supermarket.dao.*;
 import com.sale.supermarket.pojo.Commodity;
 import com.sale.supermarket.pojo.Member;
 import com.sale.supermarket.pojo.User;
-import com.sale.supermarket.utils.CommodityVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

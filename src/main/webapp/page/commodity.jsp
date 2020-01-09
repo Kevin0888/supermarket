@@ -19,7 +19,7 @@
 <script type="text/javascript">
     function to_add_commodities() {
 
-        $("#commodity_fm").attr('action', '/supermarket/inputCommodities');
+        $("#commodity_fm").attr('action', '/supermarket/inputCommodities.htm');
         $("#commodity_fm").submit();
 
     }

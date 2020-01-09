@@ -75,7 +75,7 @@ public class SuperMarketController {
      * @throws IOException
      */
     @RequestMapping(path = "/addMember")
-    public String addMember(HttpServletRequest req) throws ServletException, IOException {
+    public String addMember(HttpServletRequest req)  {
 
         Member member = new Member();
         member.setId(Integer.parseInt(req.getParameter("id")));
@@ -98,7 +98,7 @@ public class SuperMarketController {
      * @throws IOException
      */
     @RequestMapping(path = "/getMembers", method = RequestMethod.GET)
-    public String getMembers(HttpServletRequest req) throws ServletException, IOException {
+    public String getMembers(HttpServletRequest req)  {
         List<Member> list =  supermarketService.getMember(Integer.parseInt(req.getParameter("id")));
         req.setAttribute("members",list);
         return "manager";
@@ -107,12 +107,11 @@ public class SuperMarketController {
     /**
      * 返回收银页面
      * @param req
-     * @param resp
      * @throws ServletException
      * @throws IOException
      */
     @RequestMapping(path = "/back2cashier", method = RequestMethod.GET)
-    public void back2cashier(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    public void back2cashier(HttpServletRequest req)  {
 
     }
 
@@ -123,7 +122,7 @@ public class SuperMarketController {
      * @throws IOException
      */
     @RequestMapping(path = "/addCommodity", method = RequestMethod.POST)
-    private void addCOrder(HttpServletRequest req) throws ServletException, IOException {
+    private void addCOrder(HttpServletRequest req)  {
         String commodityID = req.getParameter("commodityID");
         String count = req.getParameter("count");
         String shoppingNumStr = req.getParameter("shoppingNum");
@@ -184,11 +183,15 @@ public class SuperMarketController {
      * @throws IOException
      */
     @RequestMapping(path = "/getCommodities", method = RequestMethod.GET)
-    public String getCommodities(HttpServletRequest req) throws ServletException, IOException {
-        List<Commodity> commodity = supermarketService.get(Integer.parseInt(req.getParameter("commodityId")));
-        req.setAttribute("commodityList",commodity);
-        return "commodity";
+    public String getCommodities(HttpServletRequest req) {
+        String id = req.getParameter("commodityId");
+        if (id != "" && id != null) {
+            List<Commodity> commodity = supermarketService.get(Integer.parseInt(id));
+            req.setAttribute("commodityList", commodity);
+            return "commodity";
         }
+        return null;
+    }
 
     /**
      * 添加商品

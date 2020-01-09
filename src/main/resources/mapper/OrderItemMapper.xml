@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.sale.supermarket.dao.OrderItemDao">
+    <insert id="add">
+        insert into tb_order_item(id,order_number,commodity_name,price,`count`,total,is_checked)
+        values (
+            #{id,jdbcType=INTEGER},
+            #{orderNumber,jdbcType=INTEGER},
+            #{commodityId,jdbcType=INTEGER},
+            #{commodityName,jdbcType=VARCHAR},
+            #{price,jdbcType=DOUBLE},
+            #{count,jdbcType=INTEGER},
+            #{total,jdbcType=DOUBLE},
+            #{isChecked,jdbcType=INTEGER}
+        );
+    </insert>
+    <select id="get" resultType="com.sale.supermarket.pojo.OrderItem">
+        SELECT
+        *
+        FROM
+        tb_order_item
+        WHERE
+        <if test="orderNum !=null and orderNum != ''">
+            order_number = #{orderNum}
+        </if>
+    </select>
+
+
+    <update id="update">
+        update tb_order_item
+        <trim prefix="set"  suffixOverrides=",">
+            <if test=" orderNumber !=null and orderNumber !='' ">order_number = #{orderNumber,jdbcType=INTEGER},</if>
+            <if test=" commodityId !=null and commodityId !='' ">commodity_id = #{commodityId,jdbcType=INTEGER},</if>
+            <if test=" commodityName !=null and commodityName !='' ">commodity_name = #{commodityName,jdbcType=VARCHAR},</if>
+            <if test=" price !=null and price !='' ">price = #{price,jdbcType=DOUBLE},</if>
+            <if test=" count !=null and count !='' ">`count` = #{count,jdbcType=INTEGER},</if>
+            <if test=" total !=null and total !='' ">total = #{total,jdbcType=DOUBLE},</if>
+            <if test=" isChecked !=null and isChecked !='' ">is_checked = #{isChecked,jdbcType=INTEGER}</if>
+        </trim>
+        where
+        id = #{id, jdbcType=INTEGER}
+    </update>
+    <delete id="delete">
+        delete
+        from tb_order_item
+        where
+        <if test="orderNum !=null and orderNum != ''">
+            order_number = #{orderNum}
+        </if>
+
+    </delete>
+
+</mapper>

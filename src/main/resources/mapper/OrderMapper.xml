@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.sale.supermarket.dao.OrderDao">
+    <insert id="add">
+        insert into tb_order(id,order_number,`sum`,user_id,member_id,checkout_type,checkout_time)
+        values (
+            #{id,jdbcType=INTEGER},
+            #{orderNumber,jdbcType=INTEGER},
+            #{sum,jdbcType=DOUBLE},
+            #{userId,jdbcType=INTEGER},
+            #{memberId,jdbcType=INTEGER},
+            #{checkoutType,jdbcType=INTEGER},
+            #{checkoutTime,jdbcType=TIMESTAMP}
+        );
+    </insert>
+    <select id="get" resultType="com.sale.supermarket.pojo.Order">
+        SELECT
+        *
+        FROM
+        tb_order
+        WHERE
+        <if test="orderNum !=null and orderNum != ''">
+            order_number = #{orderNum}
+        </if>
+    </select>
+
+
+    <update id="update">
+        update tb_order
+        <trim prefix="set"  suffixOverrides=",">
+            <if test=" orderNumber !=null and orderNumber !='' ">order_number = #{orderNumber,jdbcType=INTEGER},</if>
+            <if test=" sum !=null and sum !='' ">`sum` = #{sum,jdbcType=DOUBLE},</if>
+            <if test=" userId !=null and userId !='' ">user_id = #{userId,jdbcType=INTEGER},</if>
+            <if test=" memberId !=null and memberId !='' ">member_id = #{memberId,jdbcType=INTEGER},</if>
+            <if test=" checkoutType !=null and checkoutType !='' ">checkout_type = #{checkoutType,jdbcType=INTEGER},</if>
+            <if test=" checkoutTime !=null and checkoutTime !='' ">checkout_time = #{checkoutTime,jdbcType=TIMESTAMP},</if>
+        </trim>
+        where
+        id = #{order_number, jdbcType=INTEGER}
+    </update>
+    <delete id="delete">
+        delete
+        from tb_order
+        where
+        <if test="orderNum !=null and orderNum != ''">
+            order_number = #{orderNum}
+        </if>
+
+    </delete>
+
+</mapper>

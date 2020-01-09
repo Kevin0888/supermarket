@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.sale.supermarket.dao.MemberDao">
+    <insert id="add">
+        insert into tb_member(id,`name`,phone,points,total,register_time,update_time)
+        values (
+        #{id,jdbcType=INTEGER},
+        #{name,jdbcType=VARCHAR},
+        #{phone,jdbcType=VARCHAR},
+        #{points,jdbcType=INTEGER},
+        #{total,jdbcType=DOUBLE},
+        null,
+        null
+        )
+    </insert>
+
+    <select id="get" resultType="com.sale.supermarket.pojo.Member">
+        SELECT
+        *
+        FROM
+        `tb_member`
+        WHERE
+        <if test="id !=null and id !=''">
+            `id` = #{id}
+        </if>
+    </select>
+
+    <update id="update">
+        update `tb_member`
+        <trim prefix="set" suffixOverrides=",">
+            <if test=" name !=null and name !='' ">`name` = #{name},</if>
+            <if test=" phone !=null and phone !='' ">`phone` = #{phone},</if>
+            <if test=" points !=null and points !='' ">points = #{points},</if>
+            <if test=" total !=null and total !='' ">total = #{total},</if>
+            <if test=" registerTime !=null and registerTime !='' ">register_time = #{registerTime},</if>
+            <if test=" updateTime !=null and updateTime !='' ">update_time = #{updateTime}</if>
+        </trim>
+    </update>
+    <delete id="delete">
+        delete
+        from tb_member
+        where
+        <if test="name !=null and phone != ''">
+            `name` = #{name} and phone={phone}
+        </if>
+    </delete>
+
+</mapper>

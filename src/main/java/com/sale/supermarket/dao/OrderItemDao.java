@@ -6,6 +6,6 @@ import com.sale.supermarket.pojo.User;
 public interface OrderItemDao {
     void delete();
     void update(OrderItem param);
-    User get(String username, String password);
-    void add();
+    OrderItem get(int orderNum);
+    void add(OrderItem orderItem);
 }

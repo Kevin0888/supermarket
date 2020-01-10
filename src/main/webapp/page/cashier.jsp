@@ -110,7 +110,7 @@
 
     List<Commodity> commodityList = (ArrayList) request.getAttribute("commodityList");
     Integer category = null == request.getAttribute("category") ? 0 : Integer.parseInt(request.getAttribute("category").toString());
-    Integer totalCost = null == request.getAttribute("totalCost") ? 0 : Integer.parseInt(request.getAttribute("totalCost").toString());
+    Double totalCost = null == request.getAttribute("totalCost") ? 0.00 : Double.parseDouble(request.getAttribute("totalCost").toString());
 %>
 
 <div align="center">
@@ -148,15 +148,15 @@
         <tbody>
         <c:forEach items="<%=commodityList%>" var="item">
             <tr>
-                <td align="center">${item.commodityid}</td>
-                <td align="center">${item.commodityname}</td>
+                <td align="center">${item.id}</td>
+                <td align="center">${item.name}</td>
                 <td align="center">${item.specification}</td>
                 <td align="center">${item.units}</td>
                 <td align="center">${item.stock}</td>
                 <td align="center">${item.price}</td>
                 <td align="center">${item.price}</td>
                 <td align="center">${item.count}</td>
-                <td align="center">${item.totalprice}</td>
+                <td align="center">${item.totalPrice}</td>
             </tr>
         </c:forEach>
         </tbody>

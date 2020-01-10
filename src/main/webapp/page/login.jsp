@@ -10,7 +10,7 @@
 <script type="text/javascript" src="${pageContext.request.contextPath}/component/jquery-3.3.1.min.js"></script>
 <script type="text/javascript">
     function to_manage_commodities() {
-        $("#login_frm").attr('action', '/supermarket/getCommodities.htm');
+        $("#login_frm").attr('action', '/supermarket/getToCommodities.htm');
         $("#login_frm").submit();
     }
 
@@ -20,7 +20,7 @@
     }
 </script>
 <body>
-<form id="login_frm">
+<form id="login_frm" method="post">
     <div align="center">
         <h1>利民超市</h1>
         <hr>

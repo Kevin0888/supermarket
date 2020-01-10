@@ -2,9 +2,7 @@ package com.sale.supermarket.service;
 
 
 import com.sale.supermarket.dao.*;
-import com.sale.supermarket.pojo.Commodity;
-import com.sale.supermarket.pojo.Member;
-import com.sale.supermarket.pojo.User;
+import com.sale.supermarket.pojo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +20,8 @@ public class SupermarketService {
     @Autowired
     OrderDao orderDao;
     @Autowired
+    OrderItemDao orderItemDao;
+    @Autowired
     MemberDao memberDao;
     @Autowired
     CommodityDao commodityDao;
@@ -34,7 +34,7 @@ public class SupermarketService {
     }
 
     public Commodity getCommodity(int commodityId) {
-       return commodityDao.getCommodity(commodityId);
+        return commodityDao.getCommodity(commodityId);
     }
 
     public List<Commodity> get(int commodityId) {
@@ -52,7 +52,7 @@ public class SupermarketService {
     }
 
     /**
-     * ÃÌº”…Ã∆∑
+     * Ê∑ªÂä†ÂïÜÂìÅ
      * @param commodity
      */
     public void inputCommodity(Commodity commodity){
@@ -78,10 +78,29 @@ public class SupermarketService {
     }
 
     public void updateMember(Member member) {
-         memberDao.update(member);
+        memberDao.update(member);
     }
 
     public void deleteCommodity(int id) {
         commodityDao.delete(id);
+    }
+
+    public void addOrder(int shoppingNumber) {
+        Order order = new Order();
+        order.setOrderNumber(shoppingNumber);
+        order.setCheckoutType(0);
+        orderDao.add(order);
+    }
+
+    public void addOrderItem(OrderItem orderItem) {
+        orderItemDao.add(orderItem);
+    }
+
+    public void updateOrderItem(int orderNum , int commodityID ) {
+        OrderItem orderItem = new OrderItem();
+        orderItem.setCommodityId(commodityID);
+        orderItem.setOrderNumber(orderNum);
+        orderItem.setIsChecked(2);
+        orderItemDao.update(orderItem);
     }
 }

@@ -3,9 +3,8 @@
 
 <mapper namespace="com.sale.supermarket.dao.OrderItemDao">
     <insert id="add">
-        insert into tb_order_item(id,order_number,commodity_name,price,`count`,total,is_checked)
+        insert into tb_order_item(order_number,commodity_id,commodity_name,price,`count`,total,is_checked)
         values (
-            #{id,jdbcType=INTEGER},
             #{orderNumber,jdbcType=INTEGER},
             #{commodityId,jdbcType=INTEGER},
             #{commodityName,jdbcType=VARCHAR},
@@ -39,7 +38,9 @@
             <if test=" isChecked !=null and isChecked !='' ">is_checked = #{isChecked,jdbcType=INTEGER}</if>
         </trim>
         where
-        id = #{id, jdbcType=INTEGER}
+        <if test="orderNumber !=null and commodityId != null">
+            order_number = #{orderNum} and  commodity_id = #{commodityId}
+        </if>
     </update>
     <delete id="delete">
         delete

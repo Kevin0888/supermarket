@@ -24,7 +24,25 @@
             order_number = #{orderNum}
         </if>
     </select>
-
+    <select id="getAllOrder" resultType="com.sale.supermarket.utils.OrderItemVO">
+        SELECT
+        ord.commodity_Id,
+        ord.commodity_name,
+        ord.count,
+        ord.order_number,
+        ord.price,
+        ord.total,
+        comm.specification,
+        comm.units,
+        comm.stock
+        FROM
+        tb_order_item ord
+        LEFT JOIN tb_commodity AS comm ON ord.commodity_Id = comm.id
+        WHERE
+        <if test="shopNum !=null and shopNum != ''">
+            order_number = #{shopNum} and is_checked = 0
+        </if>
+    </select>
 
     <update id="update">
         update tb_order_item

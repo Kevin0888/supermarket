@@ -3,6 +3,7 @@ package com.sale.supermarket.service;
 
 import com.sale.supermarket.dao.*;
 import com.sale.supermarket.pojo.*;
+import com.sale.supermarket.utils.OrderItemVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -102,5 +103,16 @@ public class SupermarketService {
         orderItem.setOrderNumber(orderNum);
         orderItem.setIsChecked(2);
         orderItemDao.update(orderItem);
+    }
+
+    public List<OrderItemVO> getAllOrder(int shoppingNumber) {
+        return orderItemDao.getAllOrder(shoppingNumber);
+    }
+
+    public void updateOrder(int orderId) {
+        Order order = new Order();
+        //todo 实体赋值
+
+        orderDao.update(order);
     }
 }

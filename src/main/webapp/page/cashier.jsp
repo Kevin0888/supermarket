@@ -7,6 +7,7 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.List" %>
+<%@ page import="com.sale.supermarket.utils.OrderItemVO" %>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -108,7 +109,7 @@
 <%
     String shoppingNum = request.getAttribute("shoppingNum").toString();
 
-    List<Commodity> commodityList = (ArrayList) request.getAttribute("commodityList");
+    List<OrderItemVO> orderItemList = (ArrayList) request.getAttribute("orderItemList");
     Integer category = null == request.getAttribute("category") ? 0 : Integer.parseInt(request.getAttribute("category").toString());
     Double totalCost = null == request.getAttribute("totalCost") ? 0.00 : Double.parseDouble(request.getAttribute("totalCost").toString());
 %>
@@ -146,17 +147,26 @@
         </tr>
         </thead>
         <tbody>
-        <c:forEach items="<%=commodityList%>" var="item">
+        <c:forEach items="<%=orderItemList%>" var="item">
             <tr>
-                <td align="center">${item.id}</td>
-                <td align="center">${item.name}</td>
+<%--                <td align="center">${item.id}</td>--%>
+<%--                <td align="center">${item.name}</td>--%>
+<%--                <td align="center">${item.specification}</td>--%>
+<%--                <td align="center">${item.units}</td>--%>
+<%--                <td align="center">${item.stock}</td>--%>
+<%--                <td align="center">${item.price}</td>--%>
+<%--                <td align="center">${item.price}</td>--%>
+<%--                <td align="center">${item.count}</td>--%>
+<%--                <td align="center">${item.totalPrice}</td>--%>
+                <td align="center">${item.commodityId}</td>
+                <td align="center">${item.commodityName}</td>
                 <td align="center">${item.specification}</td>
                 <td align="center">${item.units}</td>
                 <td align="center">${item.stock}</td>
                 <td align="center">${item.price}</td>
                 <td align="center">${item.price}</td>
                 <td align="center">${item.count}</td>
-                <td align="center">${item.totalPrice}</td>
+                <td align="center">${item.total}</td>
             </tr>
         </c:forEach>
         </tbody>

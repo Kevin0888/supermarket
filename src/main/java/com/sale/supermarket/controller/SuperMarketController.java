@@ -8,6 +8,7 @@ import com.sale.supermarket.service.SupermarketService;
 import com.sale.supermarket.utils.CommodityVO;
 import com.sale.supermarket.utils.DateUtil;
 import com.sale.supermarket.utils.IDUtil;
+import com.sale.supermarket.utils.OrderItemVO;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.BeanUtils;
@@ -146,7 +147,7 @@ public class SuperMarketController {
                 shoppingNumber = IDUtil.getId();
                 supermarketService.addOrder(shoppingNumber);
             }
-            //转换实体，CommodityOV
+            //转换实体CommodityOV，
             CommodityVO commodityVO = new CommodityVO();
             BeanUtils.copyProperties(commodity, commodityVO);
             commodityVO.setCount(Integer.parseInt(count));
@@ -167,16 +168,20 @@ public class SuperMarketController {
             //添加订单详情
             supermarketService.addOrderItem(orderItem);
             //回显页面
-            category = commodityList.size();
+            //先查该订单号的所有信息，
+          List<OrderItemVO> ord =  supermarketService.getAllOrder(shoppingNumber);
+            for (OrderItemVO item1 : ord) {
+                totalCost += item1.getTotal();
+            }
+            category = ord.size();
             req.setAttribute("shoppingNum", String.valueOf(shoppingNumber));
-            req.setAttribute("commodityList", commodityList);
+            req.setAttribute("orderItemList", ord);
             req.setAttribute("totalCost", String.valueOf(totalCost));
             req.setAttribute("category", String.valueOf(category));
             return "cashier";
         } else {
             return "cashier";
         }
-
 
     }
 
@@ -256,15 +261,34 @@ public class SuperMarketController {
 
     /**
      * 现金结账
-     *
      * @param req
-     * @param resp
      * @throws ServletException
      * @throws IOException
      */
     @RequestMapping(path = "/checkoutByCash", method = RequestMethod.GET)
-    public void checkoutByCash(HttpServletRequest req, HttpServletResponse resp)  {
+    public void checkoutByCash(HttpServletRequest req)  {
+        /**
+         * shoppingNum: 1132301181
+         * commodityID:
+         * count:
+         * category: 2
+         * total_cost: 10.0
+         * cash_receive: 20
+         * cash_balance: 10
+         * memberID:
+         */
+        String orderNum = req.getParameter("shoppingNum");
+        String total = req.getParameter("total_cost");
+        String member = req.getParameter("memberID");
+        if (orderNum!=""){
+            int orderId = Integer.parseInt(orderNum);
+            //更新order表
+            supermarketService.updateOrder(orderId);
+        }
 
+        //更新orderItem表为已结账
+        //更新库存数量commdity表
+        //
     }
 
     /**

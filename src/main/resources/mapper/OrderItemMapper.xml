@@ -21,7 +21,7 @@
         tb_order_item
         WHERE
         <if test="orderNum !=null and orderNum != ''">
-            order_number = #{orderNum}
+            order_number = #{orderNum} and is_checked = 0
         </if>
     </select>
     <select id="getAllOrder" resultType="com.sale.supermarket.utils.OrderItemVO">
@@ -48,7 +48,7 @@
         update tb_order_item
         <trim prefix="set"  suffixOverrides=",">
             <if test=" orderNumber !=null and orderNumber !='' ">order_number = #{orderNumber,jdbcType=INTEGER},</if>
-            <if test=" commodityId !=null and commodityId !='' ">commodity_id = #{commodityId,jdbcType=INTEGER},</if>
+            <if test=" commodityId != 0 ">commodity_id = #{commodityId,jdbcType=INTEGER},</if>
             <if test=" commodityName !=null and commodityName !='' ">commodity_name = #{commodityName,jdbcType=VARCHAR},</if>
             <if test=" price !=null and price !='' ">price = #{price,jdbcType=DOUBLE},</if>
             <if test=" count !=null and count !='' ">`count` = #{count,jdbcType=INTEGER},</if>
@@ -56,8 +56,8 @@
             <if test=" isChecked !=null and isChecked !='' ">is_checked = #{isChecked,jdbcType=INTEGER}</if>
         </trim>
         where
-        <if test="orderNumber !=null and commodityId != null">
-            order_number = #{orderNum} and  commodity_id = #{commodityId}
+        <if test="orderNumber != 0">
+            order_number = #{orderNumber} and  is_checked = 0
         </if>
     </update>
     <delete id="delete">

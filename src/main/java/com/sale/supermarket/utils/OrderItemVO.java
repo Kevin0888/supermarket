@@ -72,6 +72,7 @@ public class OrderItemVO {
 
     public void setCount(int count) {
         this.count = count;
+        this.total = this.count * this.price;
     }
 
     public double getTotal() {

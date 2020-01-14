@@ -20,7 +20,7 @@
         `tb_commodity`
         WHERE
         <if test="id !=null and id != ''">
-            id = #{id}
+            id = #{id} and is_delete = 0
         </if>
     </select>
     <select id="getCommodity" resultType="com.sale.supermarket.pojo.Commodity">
@@ -30,26 +30,28 @@
         `tb_commodity`
         WHERE
         <if test="id !=null and id != ''">
-            id = #{id}
+            id = #{id} and is_delete = 0
         </if>
     </select>
 
     <update id="update">
         update `tb_commodity`
         <trim prefix="set"  suffixOverrides=",">
-            <if test=" username !=null and username !='' ">username = #{username, jdbcType=INTEGER},</if>
-            <if test=" password !=null and password !='' "> password = #{password, jdbcType=CHAR },</if>
-            <if test=" role !=null and role !='' ">role = #{role,jdbcType=INTEGER}</if>
+            <if test=" name !=null and name !='' ">`name` = #{name, jdbcType=CHAR},</if>
+            <if test=" specification !=null and specification !='' "> specification = #{specification, jdbcType=CHAR },</if>
+            <if test=" units !=null and units !='' ">units = #{units, jdbcType=CHAR},</if>
+            <if test=" price !=null and price !='' ">price = #{price, jdbcType=DOUBLE},</if>
+            <if test=" stock !=null and stock !='' ">stock = #{stock,jdbcType=INTEGER}</if>
         </trim>
         where
-        id = #{id, jdbcType=INTEGER}
+        id = #{id, jdbcType=INTEGER} and is_delete = 0
     </update>
     <delete id="delete">
-        delete
-        from tb_commodity
+        update `tb_commodity`
+        set is_delete = 1
         where
         <if test="id !=null and id != ''">
-            id = #{id}
+            id = #{id} and is_delete = 0
         </if>
 
     </delete>

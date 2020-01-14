@@ -34,10 +34,10 @@
             <if test=" userId !=null and userId !='' ">user_id = #{userId,jdbcType=INTEGER},</if>
             <if test=" memberId !=null and memberId !='' ">member_id = #{memberId,jdbcType=INTEGER},</if>
             <if test=" checkoutType !=null and checkoutType !='' ">checkout_type = #{checkoutType,jdbcType=INTEGER},</if>
-            <if test=" checkoutTime !=null and checkoutTime !='' ">checkout_time = #{checkoutTime,jdbcType=TIMESTAMP},</if>
+            <if test=" checkoutTime !=null and checkoutTime !='' ">checkout_time = #{checkoutTime,jdbcType=TIMESTAMP}</if>
         </trim>
         where
-        id = #{order_number, jdbcType=INTEGER}
+        order_number = #{orderNumber, jdbcType=INTEGER}
     </update>
     <delete id="delete">
         delete

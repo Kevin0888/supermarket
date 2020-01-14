@@ -129,12 +129,13 @@ public class SuperMarketController {
         String count = req.getParameter("count");
         String shoppingNumStr = req.getParameter("shoppingNum").trim();
         Double totalCost = 0.0;
+        Double total =0.0;
         int category = 0;
         int shoppingNumber = 0;
 
         //根据Id查商品详情
         Commodity commodity = supermarketService.getCommodity(Integer.parseInt(commodityID));
-        if (commodity != null) {
+        if (commodity != null && commodity.getStock() > 0) {
             //根据流水号判断是否添加订单
             if (shoppingNumStr != null && shoppingNumStr != "") {
                 shoppingNumber = Integer.parseInt(shoppingNumStr);
@@ -151,12 +152,6 @@ public class SuperMarketController {
             CommodityVO commodityVO = new CommodityVO();
             BeanUtils.copyProperties(commodity, commodityVO);
             commodityVO.setCount(Integer.parseInt(count));
-            List<CommodityVO> commodityList = new ArrayList<>();
-            commodityList.add(commodityVO);
-
-            for (CommodityVO item : commodityList) {
-                totalCost += item.getTotalPrice();
-            }
             OrderItem orderItem = new OrderItem();
             orderItem.setOrderNumber(shoppingNumber);
             orderItem.setCommodityId(Integer.parseInt(commodityID));
@@ -180,7 +175,7 @@ public class SuperMarketController {
             req.setAttribute("category", String.valueOf(category));
             return "cashier";
         } else {
-            return "cashier";
+            return "商品不存在或没有库存";
         }
 
     }
@@ -193,10 +188,11 @@ public class SuperMarketController {
      */
     @RequestMapping(path = "/removeCommodity", method = RequestMethod.POST)
     public void removeBoughtCommodity(HttpServletRequest req) {
-        String commodityID = req.getParameter("commodityID").trim();
+        String commodityId = req.getParameter("commodityID").trim();
         String shoppingNumStr = req.getParameter("shoppingNum").trim();
-        if (commodityID!=null && shoppingNumStr!=null && shoppingNumStr!=""){
-            supermarketService.updateOrderItem(Integer.parseInt(shoppingNumStr),Integer.parseInt(commodityID));
+        if (commodityId!=null && commodityId!="" && shoppingNumStr!=null && shoppingNumStr!=""){
+            int ischeck = 2;
+            supermarketService.updateOrderItem(Integer.parseInt(shoppingNumStr),Integer.parseInt(commodityId),ischeck);
         }
 
     }
@@ -217,7 +213,8 @@ public class SuperMarketController {
     public String getCommodities(HttpServletRequest req) {
         String id = req.getParameter("commodityId").trim();
         if (id != "" && id != null) {
-            List<Commodity> commodity = supermarketService.get(Integer.parseInt(id));
+            int Id = Integer.parseInt(id);
+            List<Commodity> commodity = supermarketService.getCommodities(Id);
             req.setAttribute("commodityList", commodity);
             return "commodity";
         }
@@ -250,8 +247,7 @@ public class SuperMarketController {
     }
 
     /**
-     * 删除商品
-     *
+     * 删除商品库存
      * @param id
      */
     @RequestMapping(path = "/deleteCommodity", method = RequestMethod.GET)
@@ -265,8 +261,8 @@ public class SuperMarketController {
      * @throws ServletException
      * @throws IOException
      */
-    @RequestMapping(path = "/checkoutByCash", method = RequestMethod.GET)
-    public void checkoutByCash(HttpServletRequest req)  {
+    @RequestMapping(path = "/checkoutByCash", method = RequestMethod.POST)
+    public String checkoutByCash(HttpServletRequest req)  {
         /**
          * shoppingNum: 1132301181
          * commodityID:
@@ -277,18 +273,35 @@ public class SuperMarketController {
          * cash_balance: 10
          * memberID:
          */
-        String orderNum = req.getParameter("shoppingNum");
+        String orderNumber = req.getParameter("shoppingNum");
         String total = req.getParameter("total_cost");
-        String member = req.getParameter("memberID");
-        if (orderNum!=""){
-            int orderId = Integer.parseInt(orderNum);
-            //更新order表
-            supermarketService.updateOrder(orderId);
+        if (orderNumber!="" && orderNumber!=null && total!="" && total!=null){
+            int orderNum = Integer.parseInt(orderNumber);
+            double totalCost = Double.parseDouble(total);
+            supermarketService.updateOrder(orderNum,totalCost);
+            //更新库存数量commdity表
+           List<OrderItem> orderItemList = supermarketService.getOrders(orderNum);
+           for(OrderItem item :orderItemList){
+               int commodityID = item.getCommodityId();
+               Commodity commodity = supermarketService.getCommodity(commodityID);
+               int stock = commodity.getStock();
+               int count = item.getCount();
+               int newStock = stock - count;
+               if (newStock<0){
+                   newStock = 0;
+               }
+               supermarketService.updateCommodityChecked(commodityID,newStock);
+           }
+            //更新订单详情状态为已结账
+            int isCheck = 1;
+            int commodityId = 0;
+            supermarketService.updateOrderItem(orderNum,commodityId,isCheck);
+            req.setAttribute("shoppingNum",0);
+            return "cashier";
+        }else{
+            return "参数不能为空";
         }
 
-        //更新orderItem表为已结账
-        //更新库存数量commdity表
-        //
     }
 
     /**

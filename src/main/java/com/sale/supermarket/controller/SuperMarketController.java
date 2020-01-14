@@ -9,6 +9,7 @@ import com.sale.supermarket.utils.CommodityVO;
 import com.sale.supermarket.utils.DateUtil;
 import com.sale.supermarket.utils.IDUtil;
 import com.sale.supermarket.utils.OrderItemVO;
+import com.sun.org.apache.bcel.internal.generic.RETURN;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.BeanUtils;
@@ -41,6 +42,7 @@ public class SuperMarketController {
 
     /**
      * 登录
+     *
      * @param req
      * @return string
      * @throws ServletException
@@ -71,6 +73,7 @@ public class SuperMarketController {
 
     /**
      * 添加会员
+     *
      * @param req
      * @return
      * @throws ServletException
@@ -87,27 +90,41 @@ public class SuperMarketController {
         member.setTotal(Integer.parseInt(req.getParameter("total")));
 //        member.setRegisterTime(DateUtil.getFormatString(6,new Date()));
         supermarketService.addMember(member);
-        List<Member> list = supermarketService.getMember(Integer.parseInt(req.getParameter("id")));
+        List<Member> list = supermarketService.getMembers(Integer.parseInt(req.getParameter("id")));
         req.setAttribute("members", list);
         return "manager";
     }
 
     /**
      * 查询会员
-     * @param req
+     *
+//     * @param req
      * @return
      * @throws ServletException
      * @throws IOException
      */
-    @RequestMapping(path = "/getMembers", method = RequestMethod.GET)
-    public String getMembers(HttpServletRequest req) {
-        List<Member> list = supermarketService.getMember(Integer.parseInt(req.getParameter("id")));
-        req.setAttribute("members", list);
-        return "manager";
+    @RequestMapping(path = "/getMember")
+    public String getMember(HttpServletRequest req) {
+        String memberID = req.getParameter("memberID");
+
+        String shopNum = req.getParameter("shopNum");
+        if (memberID != null || memberID != "") {
+            Member member = supermarketService.getMember(Integer.parseInt(memberID));
+            req.setAttribute("members", member);
+            if (shopNum !=null && shopNum != "") {
+                req.setAttribute("shoppingNum", String.valueOf(Integer.parseInt(shopNum)));
+            }else{
+                req.setAttribute("shoppingNum", 0);
+            }
+            return "cashier";
+        }
+
+        return null;
     }
 
     /**
      * 返回收银页面
+     *
      * @param req
      * @throws ServletException
      * @throws IOException
@@ -119,57 +136,27 @@ public class SuperMarketController {
 
     /**
      * 买商品，添加订单详情
+     *
      * @param req
      * @throws ServletException
      * @throws IOException
      */
     @RequestMapping(path = "/addCommodity", method = RequestMethod.POST)
-    private String addCommodity(HttpServletRequest req) {
+    public String addCommodity(HttpServletRequest req) {
         String commodityID = req.getParameter("commodityID");
         String count = req.getParameter("count");
         String shoppingNumStr = req.getParameter("shoppingNum").trim();
+        int shopNumber = supermarketService.addCommodity(commodityID, count, shoppingNumStr);
+        if (shopNumber!= 0){
         Double totalCost = 0.0;
-        Double total =0.0;
         int category = 0;
-        int shoppingNumber = 0;
-
-        //根据Id查商品详情
-        Commodity commodity = supermarketService.getCommodity(Integer.parseInt(commodityID));
-        if (commodity != null && commodity.getStock() > 0) {
-            //根据流水号判断是否添加订单
-            if (shoppingNumStr != null && shoppingNumStr != "") {
-                shoppingNumber = Integer.parseInt(shoppingNumStr);
-                if (shoppingNumber == 0) {
-                    //初次购买，添加订单记录
-                    shoppingNumber = IDUtil.getId();
-                    supermarketService.addOrder(shoppingNumber);
-                }
-            } else {
-                shoppingNumber = IDUtil.getId();
-                supermarketService.addOrder(shoppingNumber);
-            }
-            //转换实体CommodityOV，
-            CommodityVO commodityVO = new CommodityVO();
-            BeanUtils.copyProperties(commodity, commodityVO);
-            commodityVO.setCount(Integer.parseInt(count));
-            OrderItem orderItem = new OrderItem();
-            orderItem.setOrderNumber(shoppingNumber);
-            orderItem.setCommodityId(Integer.parseInt(commodityID));
-            orderItem.setCommodityName(commodity.getName());
-            orderItem.setPrice(commodity.getPrice());
-            orderItem.setCount(Integer.parseInt(count));
-            orderItem.setTotal(commodityVO.getTotalPrice());
-            orderItem.setIsChecked(0);
-            //添加订单详情
-            supermarketService.addOrderItem(orderItem);
-            //回显页面
-            //先查该订单号的所有信息，
-          List<OrderItemVO> ord =  supermarketService.getAllOrder(shoppingNumber);
+            //回显页面,先查该订单号的所有信息，
+            List<OrderItemVO> ord = supermarketService.getAllOrder(shopNumber);
             for (OrderItemVO item1 : ord) {
                 totalCost += item1.getTotal();
             }
             category = ord.size();
-            req.setAttribute("shoppingNum", String.valueOf(shoppingNumber));
+            req.setAttribute("shoppingNum", String.valueOf(shopNumber));
             req.setAttribute("orderItemList", ord);
             req.setAttribute("totalCost", String.valueOf(totalCost));
             req.setAttribute("category", String.valueOf(category));
@@ -182,23 +169,38 @@ public class SuperMarketController {
 
     /**
      * 移除订单商品
+     *
      * @param req
      * @throws ServletException
      * @throws IOException
      */
     @RequestMapping(path = "/removeCommodity", method = RequestMethod.POST)
-    public void removeBoughtCommodity(HttpServletRequest req) {
+    public String removeCommodity(HttpServletRequest req) {
         String commodityId = req.getParameter("commodityID").trim();
         String shoppingNumStr = req.getParameter("shoppingNum").trim();
-        if (commodityId!=null && commodityId!="" && shoppingNumStr!=null && shoppingNumStr!=""){
+        if (commodityId != null && commodityId != "" && shoppingNumStr != null && shoppingNumStr != "") {
             int ischeck = 2;
-            supermarketService.updateOrderItem(Integer.parseInt(shoppingNumStr),Integer.parseInt(commodityId),ischeck);
+            supermarketService.updateOrderItem(Integer.parseInt(shoppingNumStr), Integer.parseInt(commodityId), ischeck);
+            double totalCost = 0.00;
+            //回显页面
+            //先查该订单号的所有信息，
+            List<OrderItemVO> ord = supermarketService.getAllOrder(Integer.parseInt(shoppingNumStr));
+            for (OrderItemVO item1 : ord) {
+                totalCost += item1.getTotal();
+            }
+            int category = ord.size();
+            req.setAttribute("shoppingNum", String.valueOf(Integer.parseInt(shoppingNumStr)));
+            req.setAttribute("orderItemList", ord);
+            req.setAttribute("totalCost", String.valueOf(totalCost));
+            req.setAttribute("category", String.valueOf(category));
+            return "cashier";
         }
-
+        return null;
     }
 
     /**
      * 查询商品信息
+     *
      * @param req
      * @return
      * @throws ServletException
@@ -209,6 +211,13 @@ public class SuperMarketController {
 
         return "commodity";
     }
+
+    /**
+     * 查询商品列表
+     *
+     * @param req
+     * @return
+     */
     @RequestMapping(path = "/getCommodities", method = RequestMethod.POST)
     public String getCommodities(HttpServletRequest req) {
         String id = req.getParameter("commodityId").trim();
@@ -222,7 +231,7 @@ public class SuperMarketController {
     }
 
     /**
-     * 添加商品
+     * 添加商品库存
      *
      * @param req
      * @return
@@ -230,7 +239,7 @@ public class SuperMarketController {
      * @throws IOException
      */
     @RequestMapping(path = "/inputCommodities", method = RequestMethod.POST)
-    public String inputCommodities(HttpServletRequest req)  {
+    public String inputCommodities(HttpServletRequest req) {
 
         Commodity commodity = new Commodity();
         commodity.setId(Integer.parseInt(req.getParameter("commodityId")));
@@ -248,6 +257,7 @@ public class SuperMarketController {
 
     /**
      * 删除商品库存
+     *
      * @param id
      */
     @RequestMapping(path = "/deleteCommodity", method = RequestMethod.GET)
@@ -257,12 +267,13 @@ public class SuperMarketController {
 
     /**
      * 现金结账
+     *
      * @param req
      * @throws ServletException
      * @throws IOException
      */
     @RequestMapping(path = "/checkoutByCash", method = RequestMethod.POST)
-    public String checkoutByCash(HttpServletRequest req)  {
+    public String checkoutByCash(HttpServletRequest req) {
         /**
          * shoppingNum: 1132301181
          * commodityID:
@@ -275,45 +286,50 @@ public class SuperMarketController {
          */
         String orderNumber = req.getParameter("shoppingNum");
         String total = req.getParameter("total_cost");
-        if (orderNumber!="" && orderNumber!=null && total!="" && total!=null){
-            int orderNum = Integer.parseInt(orderNumber);
-            double totalCost = Double.parseDouble(total);
-            supermarketService.updateOrder(orderNum,totalCost);
-            //更新库存数量commdity表
-           List<OrderItem> orderItemList = supermarketService.getOrders(orderNum);
-           for(OrderItem item :orderItemList){
-               int commodityID = item.getCommodityId();
-               Commodity commodity = supermarketService.getCommodity(commodityID);
-               int stock = commodity.getStock();
-               int count = item.getCount();
-               int newStock = stock - count;
-               if (newStock<0){
-                   newStock = 0;
-               }
-               supermarketService.updateCommodityChecked(commodityID,newStock);
-           }
-            //更新订单详情状态为已结账
-            int isCheck = 1;
-            int commodityId = 0;
-            supermarketService.updateOrderItem(orderNum,commodityId,isCheck);
-            req.setAttribute("shoppingNum",0);
-            return "cashier";
-        }else{
-            return "参数不能为空";
-        }
+       int a = supermarketService.checkoutByCash(orderNumber,total);
 
+//        if (orderNumber != "" && orderNumber != null && total != "" && total != null) {
+//            int orderNum = Integer.parseInt(orderNumber);
+//            double totalCost = Double.parseDouble(total);
+//            //更新订单信息
+//            supermarketService.updateOrder(orderNum, totalCost);
+//            //更新库存数量commdity表
+//            List<OrderItem> orderItemList = supermarketService.getOrders(orderNum);
+//            for (OrderItem item : orderItemList) {
+//                int commodityID = item.getCommodityId();
+//                Commodity commodity = supermarketService.getCommodity(commodityID);
+//                int stock = commodity.getStock();
+//                int count = item.getCount();
+//                int newStock = stock - count;
+//                if (newStock < 0) {
+//                    newStock = 0;
+//                }
+//                supermarketService.updateCommodityChecked(commodityID, newStock);
+//            }
+//            //更新订单详情状态为已结账
+//            int isCheck = 1;
+//            int commodityId = 0;
+//            supermarketService.updateOrderItem(orderNum, commodityId, isCheck);
+//            req.setAttribute("shoppingNum", 0);
+//            return "cashier";
+//        } else {
+//            return "参数不能为空";
+//        }
+        if (a==0) {
+            req.setAttribute("shoppingNum", 0);
+            return "cashier";
+        }
+        return null;
     }
 
     /**
      * 会员结账
-     *
      * @param req
-     * @param resp
      * @throws ServletException
      * @throws IOException
      */
-    @RequestMapping(path = "/checkoutByMember", method = RequestMethod.GET)
-    public void checkoutByMember(HttpServletRequest req, HttpServletResponse resp)  {
-
+    @RequestMapping(path = "/checkoutByMember", method = RequestMethod.POST)
+    public String checkoutByMember(HttpServletRequest req) {
+        return "receipt";
     }
 }

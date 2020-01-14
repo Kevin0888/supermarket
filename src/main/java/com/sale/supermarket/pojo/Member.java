@@ -1,6 +1,7 @@
 package com.sale.supermarket.pojo;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 
 
 public class Member implements Serializable {
@@ -9,8 +10,24 @@ public class Member implements Serializable {
     private int points;
     private double total;
     private String phone;
-    private int registerTime;
-    private int updateTime;
+    private Timestamp registerTime;
+    private Timestamp updateTime;
+
+    public Timestamp getRegisterTime() {
+        return registerTime;
+    }
+
+    public void setRegisterTime(Timestamp registerTime) {
+        this.registerTime = registerTime;
+    }
+
+    public Timestamp getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Timestamp updateTime) {
+        this.updateTime = updateTime;
+    }
 
     public int getId() {
         return id;
@@ -52,19 +69,5 @@ public class Member implements Serializable {
         this.phone = phone;
     }
 
-    public int getRegisterTime() {
-        return registerTime;
-    }
 
-    public void setRegisterTime(int registerTime) {
-        this.registerTime = registerTime;
-    }
-
-    public int getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(int updateTime) {
-        this.updateTime = updateTime;
-    }
 }

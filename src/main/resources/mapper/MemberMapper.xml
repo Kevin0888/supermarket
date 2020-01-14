@@ -21,11 +21,20 @@
         FROM
         `tb_member`
         WHERE
-        <if test="id !=null and id !=''">
+        <if test="id != 0">
             `id` = #{id}
         </if>
     </select>
-
+    <select id="getMembers" resultType="com.sale.supermarket.pojo.Member">
+        SELECT
+        *
+        FROM
+        `tb_member`
+        WHERE
+        <if test="id != 0">
+            `id` = #{id}
+        </if>
+    </select>
     <update id="update">
         update `tb_member`
         <trim prefix="set" suffixOverrides=",">

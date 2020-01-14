@@ -56,8 +56,8 @@
             <if test=" isChecked !=null and isChecked !='' ">is_checked = #{isChecked,jdbcType=INTEGER}</if>
         </trim>
         where
-        <if test="orderNumber != 0">
-            order_number = #{orderNumber} and  is_checked = 0
+        <if test="orderNumber != 0 ">
+            order_number = #{orderNumber} and commodity_id = #{commodityId} and is_checked = 0
         </if>
     </update>
     <delete id="delete">

@@ -12,6 +12,7 @@ public class Commodity implements Serializable {
     private int stock;
 
 
+
     public int getId() {
         return id;
     }

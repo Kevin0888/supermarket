@@ -3,11 +3,10 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="com.sale.supermarket.pojo.Commodity" %>
+<%@ page import="com.sale.supermarket.utils.OrderItemVO" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.List" %>
-<%@ page import="com.sale.supermarket.utils.OrderItemVO" %>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -90,11 +89,12 @@
     function showMember() {
         var memberID = $("#member_id_txt").val();
         $.ajax({
-            type: "get",
-            url: "getMember",
-            data: {memberID: memberID},
+            type: "POST",
+            url: "getMember.htm",
+            data: {memberID: memberID,shopNum:shopNum},
             dataType: "json",
             success: function (data) {
+                console.log(data);
                 $("#member_balance_lbl").text(data.total);
                 $("#member_points_lbl").text(data.points);
                 $("#member_name_lbl").text(data.name);
@@ -108,7 +108,6 @@
 <body>
 <%
     String shoppingNum = request.getAttribute("shoppingNum").toString();
-
     List<OrderItemVO> orderItemList = (ArrayList) request.getAttribute("orderItemList");
     Integer category = null == request.getAttribute("category") ? 0 : Integer.parseInt(request.getAttribute("category").toString());
     Double totalCost = null == request.getAttribute("totalCost") ? 0.00 : Double.parseDouble(request.getAttribute("totalCost").toString());

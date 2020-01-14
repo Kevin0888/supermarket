@@ -3,14 +3,15 @@
 
 <mapper namespace="com.sale.supermarket.dao.CommodityDao">
     <insert id="add">
-        insert into tb_commodity(id,`name`,specification,units,price,stock)
+        insert into tb_commodity(id,`name`,specification,units,price,stock,is_delete)
         values (
             #{id,jdbcType=INTEGER},
             #{name,jdbcType=CHAR},
             #{specification,jdbcType=CHAR},
             #{units,jdbcType=CHAR},
             #{price,jdbcType=DOUBLE},
-            #{stock,jdbcType=INTEGER}
+            #{stock,jdbcType=INTEGER},
+            0
         );
     </insert>
     <select id="get" resultType="com.sale.supermarket.pojo.Commodity">
@@ -41,7 +42,7 @@
             <if test=" specification !=null and specification !='' "> specification = #{specification, jdbcType=CHAR },</if>
             <if test=" units !=null and units !='' ">units = #{units, jdbcType=CHAR},</if>
             <if test=" price !=null and price !='' ">price = #{price, jdbcType=DOUBLE},</if>
-            <if test=" stock !=null and stock !='' ">stock = #{stock,jdbcType=INTEGER}</if>
+            <if test=" stock !=null and stock !='' ">stock = #{stock,jdbcType=INTEGER},</if>
         </trim>
         where
         id = #{id, jdbcType=INTEGER} and is_delete = 0

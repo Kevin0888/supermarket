@@ -32,7 +32,7 @@
             <if test=" orderNumber !=null and orderNumber !='' ">order_number = #{orderNumber,jdbcType=INTEGER},</if>
             <if test=" sum !=null and sum !='' ">`sum` = #{sum,jdbcType=DOUBLE},</if>
             <if test=" userId !=null and userId !='' ">user_id = #{userId,jdbcType=INTEGER},</if>
-            <if test=" memberId !=null and memberId !='' ">member_id = #{memberId,jdbcType=INTEGER},</if>
+            <if test=" memberId != 0 ">member_id = #{memberId,jdbcType=INTEGER},</if>
             <if test=" checkoutType !=null and checkoutType !='' ">checkout_type = #{checkoutType,jdbcType=INTEGER},</if>
             <if test=" checkoutTime !=null and checkoutTime !='' ">checkout_time = #{checkoutTime,jdbcType=TIMESTAMP}</if>
         </trim>

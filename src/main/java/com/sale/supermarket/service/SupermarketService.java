@@ -1,6 +1,7 @@
 package com.sale.supermarket.service;
 
 
+import com.github.pagehelper.util.StringUtil;
 import com.sale.supermarket.dao.*;
 import com.sale.supermarket.pojo.*;
 import com.sale.supermarket.utils.CommodityVO;
@@ -31,6 +32,8 @@ public class SupermarketService {
     MemberDao memberDao;
     @Autowired
     CommodityDao commodityDao;
+    @Autowired
+    MemberRecordDao memberRecordDao;
 
 
     /**
@@ -115,6 +118,11 @@ public class SupermarketService {
         memberDao.add(member);
     }
 
+    /**
+     * 更新会员
+     *
+     * @param member
+     */
     public void updateMember(Member member) {
         memberDao.update(member);
     }
@@ -141,13 +149,24 @@ public class SupermarketService {
     }
 
     /**
-     * 查询该订单号的所有记录
+     * 查询未结账的所有记录
      *
      * @param shoppingNumber
      * @return
      */
-    public List<OrderItemVO> getAllOrder(int shoppingNumber) {
-        return orderItemDao.getAllOrder(shoppingNumber);
+    public List<OrderItemVO> getAllUncheck(int shoppingNumber) {
+        return orderItemDao.getAllUncheck(shoppingNumber);
+    }
+
+
+    /**
+     * 查询已结账的所有记录
+     *
+     * @param shoppingNumber
+     * @return
+     */
+    public List<OrderItemVO> getAllChecked(int shoppingNumber) {
+        return orderItemDao.getAllChecked(shoppingNumber);
     }
 
     /**
@@ -155,10 +174,11 @@ public class SupermarketService {
      *
      * @param orderNum
      */
-    public void updateOrder(int orderNum, double totalPrice) {
+    public void updateOrder(int orderNum, double totalPrice, int memberId) {
         Order order = new Order();
         order.setOrderNumber(orderNum);
         order.setSum(totalPrice);
+        order.setMemberId(memberId);
         order.setCheckoutType(1);
         orderDao.update(order);
 
@@ -208,6 +228,16 @@ public class SupermarketService {
         commodityDao.update(commodity);
     }
 
+    public void addMemberRecord(int memberID, int shopNum, double totalCost) {
+        int total = new Double(totalCost).intValue();
+        MemberRecord memRecord = new MemberRecord();
+        memRecord.setMemberId(memberID);
+        memRecord.setOrderNumber(shopNum);
+        memRecord.setReceivedPoints(total);
+        memRecord.setSum(totalCost);
+        memberRecordDao.addRecord(memRecord);
+    }
+
     /**
      * 现金结账流程，添加事务
      *
@@ -217,11 +247,11 @@ public class SupermarketService {
      */
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public int checkoutByCash(String orderNumber, String total) {
-        if (orderNumber != "" && orderNumber != null && total != "" && total != null) {
+        if (StringUtil.isNotEmpty(orderNumber) && StringUtil.isNotEmpty(total)) {
             int orderNum = Integer.parseInt(orderNumber);
             double totalCost = Double.parseDouble(total);
             //更新订单信息
-            updateOrder(orderNum, totalCost);
+            updateOrder(orderNum, totalCost, 0);
             //更新库存数量commdity表
             List<OrderItem> orderItemList = getOrders(orderNum);
             for (OrderItem item : orderItemList) {
@@ -236,7 +266,6 @@ public class SupermarketService {
                 updateCommodityChecked(commodityID, newStock);
                 //更新订单详情状态为已结账
                 int isCheck = 1;
-//                int commodityId = 0;
                 updateOrderItem(orderNum, commodityID, isCheck);
             }
 
@@ -246,7 +275,62 @@ public class SupermarketService {
     }
 
     /**
+     * 会员结账流程，添加事务
+     *
+     * @param shopNumber
+     * @param total
+     * @return
+     */
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    public int checkoutByMember(String shopNumber, String total, String memberId) {
+        if (StringUtil.isNotEmpty(shopNumber) && StringUtil.isNotEmpty(total) && memberId.trim() != "0") {
+            int shopNum = Integer.parseInt(shopNumber);
+            int memberID = Integer.parseInt(memberId);
+            double totalCost = Double.parseDouble(total);
+            int totalMember = new Double(totalCost).intValue();
+            //更新订单信息
+            updateOrder(shopNum, totalCost, memberID);
+            //更新库存数量commdity表
+            List<OrderItem> orderItemList = getOrders(shopNum);
+            for (OrderItem item : orderItemList) {
+                int commodityID = item.getCommodityId();
+                Commodity commodity = getCommodity(commodityID);
+                int stock = commodity.getStock();
+                int count = item.getCount();
+                int newStock = stock - count;
+                if (newStock < 0) {
+                    newStock = 0;
+                }
+                updateCommodityChecked(commodityID, newStock);
+                //更新订单详情状态为已结账
+                int isCheck = 1;
+                updateOrderItem(shopNum, commodityID, isCheck);
+            }
+            //添加会员消费记录
+            addMemberRecord(memberID, shopNum, totalCost);
+            //更新会员记录
+            //查会员记录表
+            Member member = getMember(memberID);
+            int points = member.getPoints();
+            int pointMem = points + totalMember;
+            double totalMem = member.getTotal();
+            double newTotal = totalMem - totalCost;
+            if (newTotal < 0) {
+                newTotal = 0.00;
+            }
+            Member m = new Member();
+            m.setId(memberID);
+            m.setPoints(pointMem);
+            m.setTotal(newTotal);
+            updateMember(m);
+            return pointMem;
+        }
+        return 99999999;
+    }
+
+    /**
      * 添加商品流程，添加事务
+     *
      * @param commodityID
      * @param count
      * @param shoppingNumStr
@@ -288,4 +372,8 @@ public class SupermarketService {
         }
         return 0;
     }
+
+
 }
+
+

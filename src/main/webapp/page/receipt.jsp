@@ -11,7 +11,7 @@
 </head>
 <body style="text-align: center">
 <div align="left" >
-    <a href="/sale/back2cashier?role=2">返回</a>
+    <a href="/supermarket/back2cashier.htm">返回</a>
 </div>
 <div align="center" style="width: 20%;margin:0 auto ;border: 1px solid #0f0f0f">
 
@@ -42,12 +42,12 @@
         </tr>
         </thead>
         <tbody>
-        <c:forEach items="${commodityList}" var="item">
+        <c:forEach items="${orderItemList}" var="item">
             <tr>
-                <td align="left">${item.commodityname}</td>
+                <td align="left">${item.commodityName}</td>
                 <td align="left">${item.price}</td>
                 <td align="left">${item.count}</td>
-                <td align="left">${item.totalprice}</td>
+                <td align="left">${item.total}</td>
             </tr>
         </c:forEach>
         </tbody>

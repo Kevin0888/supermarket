@@ -2,45 +2,58 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 
 <mapper namespace="com.sale.supermarket.dao.MemberRecordDao">
-    <insert id="add">
-        insert into tb_user(id,username,password,role)
+    <insert id="addRecord">
+        insert into tb_member_record (id,`member_id`,user_id,order_number,`sum`,balance,received_points,checkout_time)
         values (
-            #{id,jdbcType=INTEGER},
-            #{username,jdbcType=CHAR},
-            #{password,jdbcType=CHAR},
-            #{role,jdbcType=INTEGER}
-        );
+        #{id,jdbcType=INTEGER},
+        #{memberId,jdbcType=INTEGER},
+        #{userId,jdbcType=INTEGER},
+        #{orderNumber,jdbcType=INTEGER},
+        #{sum,jdbcType=DOUBLE},
+        #{balance,jdbcType=DOUBLE},
+        #{receivedPoints,jdbcType=INTEGER},
+        #{checkoutTime,jdbcType=TIMESTAMP}
+        )
     </insert>
-    <select id="get" resultType="com.sale.supermarket.pojo.User">
+
+    <select id="getRecord" resultType="com.sale.supermarket.pojo.Member">
         SELECT
         *
         FROM
-        `tb_user`
+        `ttb_member_record`
         WHERE
-        <if test="username !=null and password != null">
-            username = #{username} and password=#{password}
+        <if test="id != 0">
+            `id` = #{id}
         </if>
     </select>
-
-
-    <update id="update">
-        update `tb_user`
-        <trim prefix="set"  suffixOverrides=",">
-            <if test=" username !=null and username !='' ">username = #{username, jdbcType=INTEGER},</if>
-            <if test=" password !=null and password !='' "> password = #{password, jdbcType=CHAR },</if>
-            <if test=" role !=null and role !='' ">role = #{role,jdbcType=INTEGER}</if>
-        </trim>
-        where
-        id = #{id, jdbcType=INTEGER}
-    </update>
-    <delete id="delete">
-        delete
-        from tb_user
-        where
-        <if test="name !=null and password != null">
-            username = #{name} and password=#{password}
+    <select id="getMembers" resultType="com.sale.supermarket.pojo.Member">
+        SELECT
+        *
+        FROM
+        `tb_member_record`
+        WHERE
+        <if test="id != 0">
+            `id` = #{id}
         </if>
-
+    </select>
+    <update id="updateRecord">
+        update `tb_member_record`
+        <trim prefix="set" suffixOverrides=",">
+            <if test=" name !=null and name !='' ">`name` = #{name},</if>
+            <if test=" phone !=null and phone !='' ">`phone` = #{phone},</if>
+            <if test=" points !=null and points !='' ">points = #{points},</if>
+            <if test=" total !=null and total !='' ">total = #{total},</if>
+            <if test=" registerTime !=null and registerTime !='' ">register_time = #{registerTime},</if>
+            <if test=" updateTime !=null and updateTime !='' ">update_time = #{updateTime}</if>
+        </trim>
+    </update>
+    <delete id="deleteRecord">
+        delete
+        from tb_member_record
+        where
+        <if test="name !=null and phone != ''">
+            `name` = #{name} and phone={phone}
+        </if>
     </delete>
 
 </mapper>

@@ -8,6 +8,9 @@
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.List" %>
 <html>
+<%
+    String shopNum = request.getAttribute("shoppingNum").toString();
+%>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>cashier</title>
@@ -88,18 +91,28 @@
 
     function showMember() {
         var memberID = $("#member_id_txt").val();
-        $.ajax({
+        if (memberID == "" || memberID == undefined) {
+            alert("请输入有效的会员卡号");
+            return;
+        }
+        var shopNum = <%=shopNum%>;
+            $.ajax({
             type: "POST",
             url: "getMember.htm",
-            data: {memberID: memberID,shopNum:shopNum},
+            data:  {memberID: memberID
+            },
             dataType: "json",
             success: function (data) {
-                console.log(data);
+                alert(data);
                 $("#member_balance_lbl").text(data.total);
                 $("#member_points_lbl").text(data.points);
                 $("#member_name_lbl").text(data.name);
+            },
+                error:function(data){
+                    alert("error");
 
-            }
+                }
+
         })
     }
 
@@ -148,15 +161,6 @@
         <tbody>
         <c:forEach items="<%=orderItemList%>" var="item">
             <tr>
-<%--                <td align="center">${item.id}</td>--%>
-<%--                <td align="center">${item.name}</td>--%>
-<%--                <td align="center">${item.specification}</td>--%>
-<%--                <td align="center">${item.units}</td>--%>
-<%--                <td align="center">${item.stock}</td>--%>
-<%--                <td align="center">${item.price}</td>--%>
-<%--                <td align="center">${item.price}</td>--%>
-<%--                <td align="center">${item.count}</td>--%>
-<%--                <td align="center">${item.totalPrice}</td>--%>
                 <td align="center">${item.commodityId}</td>
                 <td align="center">${item.commodityName}</td>
                 <td align="center">${item.specification}</td>

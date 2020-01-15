@@ -1,8 +1,5 @@
 package com.sale.supermarket.utils;
 
-import javax.annotation.sql.DataSourceDefinition;
-
-
 public class OrderItemVO {
 
     private int id;

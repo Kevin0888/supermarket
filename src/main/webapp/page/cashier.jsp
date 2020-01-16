@@ -103,7 +103,6 @@
             },
             dataType: "json",
             success: function (data) {
-                alert(data);
                 $("#member_balance_lbl").text(data.total);
                 $("#member_points_lbl").text(data.points);
                 $("#member_name_lbl").text(data.name);

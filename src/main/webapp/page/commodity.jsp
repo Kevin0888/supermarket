@@ -10,6 +10,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@page import="java.util.Date" %>
+<%@ page import="java.util.Random" %>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -25,6 +26,12 @@
     }
 </script>
 <body>
+<%
+    Random random = new Random();
+    //生成随机flag，
+    Integer   flag=new   Integer(random.nextInt());
+    session.setAttribute("flag",flag);
+%>
 <div align="center">
     <h1>进货管理</h1>
     <hr>
@@ -47,6 +54,7 @@
         <br>
         <input type="button" id="add_btn" value="入库" onclick="to_add_commodities()"/>
         <input type="button" id="cancel_btn" value="取消" onclick=""/>
+        <input   type=hidden   name="flag"   value="<%=flag%>">
     </div>
     <br>
     <hr>

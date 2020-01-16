@@ -45,6 +45,8 @@
             <if test=" registerTime !=null and registerTime !='' ">register_time = #{registerTime},</if>
             <if test=" updateTime !=null and updateTime !='' ">update_time = #{updateTime}</if>
         </trim>
+        where
+            id = #{id}
     </update>
     <delete id="delete">
         delete

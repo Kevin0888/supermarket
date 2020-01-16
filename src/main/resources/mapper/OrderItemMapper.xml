@@ -20,7 +20,7 @@
         FROM
         tb_order_item
         WHERE
-        <if test="orderNum !=null and orderNum != ''">
+        <if test="orderNum != 0">
             order_number = #{orderNum} and is_checked = 0
         </if>
     </select>

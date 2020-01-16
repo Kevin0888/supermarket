@@ -19,6 +19,7 @@ import sun.swing.StringUIClientPropertyKey;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -91,13 +92,14 @@ public class SuperMarketController {
 
     /**
      * 查询会员
+     * <p>
+     * //     * @param req
      *
-//     * @param req
      * @return
      * @throws ServletException
      * @throws IOException
      */
-    @RequestMapping(path = "/getMember",produces = {"text/html;charset=UTF-8"})
+    @RequestMapping(path = "/getMember", produces = {"text/html;charset=UTF-8"})
     @ResponseBody
     public String getMember(@RequestParam("memberID") String memberID) {
         /**
@@ -163,9 +165,9 @@ public class SuperMarketController {
         String count = req.getParameter("count");
         String shoppingNumStr = req.getParameter("shoppingNum").trim();
         int shopNumber = supermarketService.addCommodity(commodityID, count, shoppingNumStr);
-        if (shopNumber!= 0){
-        Double totalCost = 0.0;
-        int category = 0;
+        if (shopNumber != 0) {
+            Double totalCost = 0.0;
+            int category = 0;
             //回显页面,先查该订单号的所有信息，
             List<OrderItemVO> ord = supermarketService.getAllUncheck(shopNumber);
             for (OrderItemVO item1 : ord) {
@@ -256,19 +258,25 @@ public class SuperMarketController {
      */
     @RequestMapping(path = "/inputCommodities", method = RequestMethod.POST)
     public String inputCommodities(HttpServletRequest req) {
-
-        Commodity commodity = new Commodity();
-        commodity.setId(Integer.parseInt(req.getParameter("commodityId")));
-        commodity.setPrice(Double.parseDouble(req.getParameter("price")));
-        commodity.setName(req.getParameter("name"));
-        commodity.setUnits(req.getParameter("units"));
-        commodity.setSpecification(req.getParameter("specification"));
-        commodity.setStock(Integer.parseInt(req.getParameter("stock")));
-        supermarketService.inputCommodity(commodity);
-        List<Commodity> list = new ArrayList<>();
-        list.add(0, commodity);
-        req.setAttribute("commodities", list);
-        return "commodity";
+        Integer flag = new Integer(Integer.parseInt(req.getParameter("flag")));
+        HttpSession session = req.getSession();
+        if (flag.equals(session.getAttribute("flag"))) {
+            Commodity commodity = new Commodity();
+            commodity.setId(Integer.parseInt(req.getParameter("commodityId")));
+            commodity.setPrice(Double.parseDouble(req.getParameter("price")));
+            commodity.setName(req.getParameter("name"));
+            commodity.setUnits(req.getParameter("units"));
+            commodity.setSpecification(req.getParameter("specification"));
+            commodity.setStock(Integer.parseInt(req.getParameter("stock")));
+            supermarketService.inputCommodity(commodity);
+            List<Commodity> list = new ArrayList<>();
+            list.add(0, commodity);
+            req.setAttribute("commodities", list);
+            session.removeAttribute("flag");
+            return "commodity";
+        } else {
+            return "commodity";
+        }
     }
 
     /**
@@ -304,9 +312,9 @@ public class SuperMarketController {
         String cashBalance = req.getParameter("cash_balance");
         String shopNumber = req.getParameter("shoppingNum");
         String total = req.getParameter("total_cost");
-        if (shopNumber!=null &&shopNumber!="" && total!=null && total!="") {
+        if (shopNumber != null && shopNumber != "" && total != null && total != "") {
             int a = supermarketService.checkoutByCash(shopNumber, total);
-            if (a==0) {
+            if (a == 0) {
                 Double totalCost = 0.0;
                 int category = 0;
                 //回显页面,先查该订单号的所有信息，
@@ -319,9 +327,9 @@ public class SuperMarketController {
                 req.setAttribute("orderItemList", ord);
                 req.setAttribute("total_cost", String.valueOf(totalCost));
                 req.setAttribute("category", String.valueOf(category));
-                req.setAttribute("checkout_type",0);
-                req.setAttribute("cash_receive",cashReceive);
-                req.setAttribute("cash_balance",cashBalance);
+                req.setAttribute("checkout_type", 0);
+                req.setAttribute("cash_receive", cashReceive);
+                req.setAttribute("cash_balance", cashBalance);
                 return "receipt";
             }
         }
@@ -330,6 +338,7 @@ public class SuperMarketController {
 
     /**
      * 会员结账
+     *
      * @param req
      * @throws ServletException
      * @throws IOException
@@ -345,15 +354,6 @@ public class SuperMarketController {
          * cash_receive: 20
          * cash_balance: 10
          * memberID:
-         *
-         * shoppingNum: 0
-         * commodityID:
-         * count:
-         * category: 0
-         * total_cost: 0.0
-         * cash_receive:
-         * cash_balance:
-         * memberID: 22
          */
         String cashReceive = req.getParameter("cash_receive");
         String cashBalance = req.getParameter("cash_balance");
@@ -361,7 +361,7 @@ public class SuperMarketController {
         String total = req.getParameter("total_cost");
         String memberId = req.getParameter("memberID");
 
-        if (StringUtil.isNotEmpty(shopNumber ) && StringUtil.isNotEmpty(total) && StringUtil.isNotEmpty(memberId)) {
+        if (StringUtil.isNotEmpty(shopNumber) && StringUtil.isNotEmpty(total) && StringUtil.isNotEmpty(memberId)) {
             int pointMem = supermarketService.checkoutByMember(shopNumber, total, memberId);
             if (pointMem != 99999999) {
                 Double totalCost = 0.0;
@@ -377,15 +377,16 @@ public class SuperMarketController {
                 req.setAttribute("orderItemList", ord);
                 req.setAttribute("total_cost", String.valueOf(totalCost));
                 req.setAttribute("category", String.valueOf(category));
-                req.setAttribute("checkout_type",1);
-                req.setAttribute("cash_receive",cashReceive);
-                req.setAttribute("cash_balance",cashBalance);
-                req.setAttribute("member_id",memberId);
-                req.setAttribute("member_current_points",totalMember);
-                req.setAttribute("member_points",pointMem);
+                req.setAttribute("checkout_type", 1);
+                req.setAttribute("cash_receive", cashReceive);
+                req.setAttribute("cash_balance", cashBalance);
+                req.setAttribute("member_id", memberId);
+                req.setAttribute("member_current_points", totalMember);
+                req.setAttribute("member_points", pointMem);
                 return "receipt";
             }
         }
-        return null;
+        req.setAttribute("shoppingNum", 0);
+        return "cashier";
     }
 }

@@ -283,49 +283,50 @@ public class SupermarketService {
      */
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public int checkoutByMember(String shopNumber, String total, String memberId) {
-        if (StringUtil.isNotEmpty(shopNumber) && StringUtil.isNotEmpty(total) && memberId.trim() != "0") {
-            int shopNum = Integer.parseInt(shopNumber);
-            int memberID = Integer.parseInt(memberId);
-            double totalCost = Double.parseDouble(total);
-            int totalMember = new Double(totalCost).intValue();
-            //更新订单信息
-            updateOrder(shopNum, totalCost, memberID);
-            //更新库存数量commdity表
-            List<OrderItem> orderItemList = getOrders(shopNum);
-            for (OrderItem item : orderItemList) {
-                int commodityID = item.getCommodityId();
-                Commodity commodity = getCommodity(commodityID);
-                int stock = commodity.getStock();
-                int count = item.getCount();
-                int newStock = stock - count;
-                if (newStock < 0) {
-                    newStock = 0;
-                }
-                updateCommodityChecked(commodityID, newStock);
-                //更新订单详情状态为已结账
-                int isCheck = 1;
-                updateOrderItem(shopNum, commodityID, isCheck);
-            }
-            //添加会员消费记录
-            addMemberRecord(memberID, shopNum, totalCost);
-            //更新会员记录
-            //查会员记录表
-            Member member = getMember(memberID);
-            int points = member.getPoints();
-            int pointMem = points + totalMember;
-            double totalMem = member.getTotal();
-            double newTotal = totalMem - totalCost;
-            if (newTotal < 0) {
-                newTotal = 0.00;
-            }
-            Member m = new Member();
-            m.setId(memberID);
-            m.setPoints(pointMem);
-            m.setTotal(newTotal);
-            updateMember(m);
-            return pointMem;
+        if ("0".equals(shopNumber.trim()) || StringUtil.isEmpty(total) || "0".equals(memberId.trim())) {
+            return 99999999;
         }
-        return 99999999;
+        int shopNum = Integer.parseInt(shopNumber);
+        int memberID = Integer.parseInt(memberId);
+        double totalCost = Double.parseDouble(total);
+        int totalMember = new Double(totalCost).intValue();
+        //更新订单信息
+        updateOrder(shopNum, totalCost, memberID);
+        //更新库存数量commdity表
+        List<OrderItem> orderItemList = getOrders(shopNum);
+        for (OrderItem item : orderItemList) {
+            int commodityID = item.getCommodityId();
+            Commodity commodity = getCommodity(commodityID);
+            int stock = commodity.getStock();
+            int count = item.getCount();
+            int newStock = stock - count;
+            if (newStock < 0) {
+                newStock = 0;
+            }
+            updateCommodityChecked(commodityID, newStock);
+            //更新订单详情状态为已结账
+            int isCheck = 1;
+            updateOrderItem(shopNum, commodityID, isCheck);
+        }
+        //添加会员消费记录
+        addMemberRecord(memberID, shopNum, totalCost);
+        //更新会员记录
+        //查会员记录表
+        Member member = getMember(memberID);
+        int points = member.getPoints();
+        int pointMem = points + totalMember;
+        double totalMem = member.getTotal();
+        double newTotal = totalMem - totalCost;
+        if (newTotal < 0) {
+            newTotal = 0.00;
+        }
+        Member m = new Member();
+        m.setId(memberID);
+        m.setPoints(pointMem);
+        m.setTotal(newTotal);
+        updateMember(m);
+        return pointMem;
+
     }
 
     /**

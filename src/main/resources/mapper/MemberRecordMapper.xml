@@ -16,7 +16,7 @@
         )
     </insert>
 
-    <select id="getRecord" resultType="com.sale.supermarket.pojo.Member">
+    <select id="getRecord" resultType="com.sale.supermarket.pojo.MemberRecord">
         SELECT
         *
         FROM
@@ -26,26 +26,20 @@
             `id` = #{id}
         </if>
     </select>
-    <select id="getMembers" resultType="com.sale.supermarket.pojo.Member">
-        SELECT
-        *
-        FROM
-        `tb_member_record`
-        WHERE
-        <if test="id != 0">
-            `id` = #{id}
-        </if>
-    </select>
+
     <update id="updateRecord">
         update `tb_member_record`
         <trim prefix="set" suffixOverrides=",">
-            <if test=" name !=null and name !='' ">`name` = #{name},</if>
-            <if test=" phone !=null and phone !='' ">`phone` = #{phone},</if>
-            <if test=" points !=null and points !='' ">points = #{points},</if>
-            <if test=" total !=null and total !='' ">total = #{total},</if>
-            <if test=" registerTime !=null and registerTime !='' ">register_time = #{registerTime},</if>
-            <if test=" updateTime !=null and updateTime !='' ">update_time = #{updateTime}</if>
+            <if test=" memberId !=null and memberId !='' ">`member_id` = #{memberId,jdbcType=INTEGER},</if>
+            <if test=" userId !=null and userId !='' ">`user_id` = #{userId,jdbcType=INTEGER},</if>
+            <if test=" orderNumber !=null and orderNumber !='' ">order_number = #{orderNumber,jdbcType=INTEGER},</if>
+            <if test=" sum !=null and sum !='' ">`sum` = #{sum,jdbcType=DOUBLE},</if>
+            <if test="balance !=null and balance !=''">balance = #{balance,jdbcType=DOUBLE}</if>
+            <if test=" receivedPoints !=null and receivedPoints !='' ">received_points = #{receivedPoints,jdbcType=INTEGER},</if>
+            <if test=" checkoutTime !=null and checkoutTime !='' ">checkout_time = #{checkoutTime,jdbcType=TIMESTAMP}</if>
         </trim>
+        where
+            member_id = #{memberId} and order_number = #{orderNumber}
     </update>
     <delete id="deleteRecord">
         delete

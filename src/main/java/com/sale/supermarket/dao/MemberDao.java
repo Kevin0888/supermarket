@@ -10,7 +10,7 @@ import java.util.List;
 public interface MemberDao {
     void delete(@Param("id") int id);
     void update(Member param);
-    Member get(@Param("id")int id);
-    List<Member> getMembers(@Param("id")int id);
+    Member getMember(@Param("id")int id);
     void add(Member member);
+    List<Member> getAllMembers();
 }

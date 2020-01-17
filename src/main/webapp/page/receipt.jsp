@@ -60,11 +60,11 @@
             <td align="left"><label>数量</label><label>${category} 件</label></td>
             <td align="right"><label>合计</label><label>${total_cost} 元</label></td>
         </tr>
-        <tr>
+        <tr<c:if test="${checkout_type == 1}"> hidden </c:if>>
             <td align="left"><label>收款</label></td>
             <td align="right"><label>${cash_receive} 元</label></td>
         </tr>
-        <tr>
+        <tr<c:if test="${checkout_type == 1}"> hidden </c:if>>
             <td align="left"><label>找零</label></td>
             <td align="right"><label>${cash_balance} 元</label></td>
         </tr>
@@ -79,6 +79,10 @@
         <tr <c:if test="${checkout_type == 0}"> hidden </c:if>}>
             <td align="left"><label>累计积分</label></td>
             <td align="right"><label>${member_points} </label></td>
+        </tr>
+        <tr<c:if test="${checkout_type == 0}"> hidden </c:if>>
+            <td align="left"><label>卡内余额</label></td>
+            <td align="right"><label>${cash_balance} 元</label></td>
         </tr>
         <tr>
             <td align="left"><label>小票号</label></td>

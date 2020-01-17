@@ -9,5 +9,8 @@
 </head>
 <body>
 <h>There is a problem </h>
+<div>
+<h> ${message}</h>
+</div>
 </body>
 </html>

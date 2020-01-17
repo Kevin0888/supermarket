@@ -14,15 +14,13 @@
             0
         );
     </insert>
-    <select id="get" resultType="com.sale.supermarket.pojo.Commodity">
+    <select id="getCommodities" resultType="com.sale.supermarket.pojo.Commodity">
         SELECT
         *
         FROM
         `tb_commodity`
-        WHERE
-        <if test="id !=null and id != ''">
-            id = #{id} and is_delete = 0
-        </if>
+        where
+            is_delete = 0
     </select>
     <select id="getCommodity" resultType="com.sale.supermarket.pojo.Commodity">
         SELECT

@@ -15,7 +15,7 @@
         )
     </insert>
 
-    <select id="get" resultType="com.sale.supermarket.pojo.Member">
+    <select id="getMember" resultType="com.sale.supermarket.pojo.Member">
         SELECT
         *
         FROM
@@ -25,15 +25,12 @@
             `id` = #{id}
         </if>
     </select>
-    <select id="getMembers" resultType="com.sale.supermarket.pojo.Member">
+    <select id="getAllMembers" resultType="com.sale.supermarket.pojo.Member">
         SELECT
         *
         FROM
         `tb_member`
-        WHERE
-        <if test="id != 0">
-            `id` = #{id}
-        </if>
+
     </select>
     <update id="update">
         update `tb_member`

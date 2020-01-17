@@ -9,8 +9,7 @@ import java.util.List;
 public interface CommodityDao {
     void delete(int id);
     void update(Commodity param);
-    List<Commodity> get(@Param("id") int id);
+    List<Commodity> getCommodities();
     void add(Commodity commodity);
-
     Commodity getCommodity(@Param("id") int id);
 }

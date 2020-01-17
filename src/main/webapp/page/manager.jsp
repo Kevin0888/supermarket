@@ -1,3 +1,4 @@
+<%@ page import="java.util.Random" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -18,6 +19,12 @@
     }
 </script>
 <body>
+<%
+    Random random = new Random();
+    //生成随机flag，
+    Integer   flag=new   Integer(random.nextInt());
+    session.setAttribute("flag",flag);
+%>
 <div align="center">
     <h1>会员管理</h1>
     <hr>
@@ -35,6 +42,7 @@
         <br>
         <input type="button" id="add_btn" value="添加" onclick="to_add_member()"/>
         <input type="button" id="cancel_btn" value="取消" onclick=""/>
+        <input   type=hidden   name="flag"   value="<%=flag%>">
         <br>
         <hr>
     </div>

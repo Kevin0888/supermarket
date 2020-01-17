@@ -461,6 +461,5 @@ public class SuperMarketController {
         req.setAttribute("member_current_points", totalMember);
         req.setAttribute("member_points", map.get("points"));
         return "receipt";
-        //todo 小票添加会员卡余额，消费金额
     }
 }

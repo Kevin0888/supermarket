@@ -5,7 +5,7 @@ import com.github.pagehelper.util.StringUtil;
 import com.sale.supermarket.pojo.Commodity;
 import com.sale.supermarket.pojo.Member;
 import com.sale.supermarket.pojo.User;
-import com.sale.supermarket.service.SupermarketService;
+import com.sale.supermarket.service.SuperMarketService;
 import com.sale.supermarket.utils.OrderItemVO;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import sun.swing.StringUIClientPropertyKey;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -31,9 +30,9 @@ import java.util.Map;
 @Controller
 @RequestMapping("/supermarket")
 public class SuperMarketController {
-
     @Autowired
-    SupermarketService supermarketService;
+    SuperMarketService superMarketService;
+
     private Logger logger = LogManager.getLogger(LogManager.ROOT_LOGGER_NAME);
 
 
@@ -45,7 +44,7 @@ public class SuperMarketController {
      * @throws ServletException
      * @throws IOException
      */
-    @RequestMapping(path ="/login", produces = {"text/html;charset=UTF-8"})
+    @RequestMapping(path = "/login", produces = {"text/html;charset=UTF-8"})
     public String login(HttpServletRequest req) {
         logger.info("----进入login方法");
         String username = req.getParameter("username");
@@ -59,20 +58,22 @@ public class SuperMarketController {
             return "error";
         }
         String role = req.getParameter("role");
-        if(StringUtil.isEmpty(role)){
+        if (StringUtil.isEmpty(role)) {
             req.setAttribute("message", "role can not be empty");
             return "error";
         }
-        User user = supermarketService.getUser(username, password);
+        User user = superMarketService.getUser(username, password);
         if (user == null) {
             req.setAttribute("message", "The user does not exist");
             return "error";
         }
-        if ( user.getRole() ==1 && user.getRole() == Integer.parseInt(role)) {
-            List<Member> list = supermarketService.getAllMembers();
+        if (user.getRole() == 1 && user.getRole() == Integer.parseInt(role)) {
+            HttpSession session = req.getSession();
+            session.setAttribute("loginName",user.getUsername());
+            List<Member> list = superMarketService.getAllMembers();
             req.setAttribute("members", list);
             return "manager";
-        } else if (user.getRole() ==2 && user.getRole() == Integer.parseInt(role)) {
+        } else if (user.getRole() == 2 && user.getRole() == Integer.parseInt(role)) {
             req.setAttribute("shoppingNum", 0);
             return "cashier";
         }
@@ -90,20 +91,24 @@ public class SuperMarketController {
      */
     @RequestMapping(path = "/addMember")
     public String addMember(HttpServletRequest req) throws Exception {
-        Integer flag = new Integer(Integer.parseInt(req.getParameter("flag")));
-        HttpSession session = req.getSession();
-        //如果flag不一致，返回原来页面
-        if (!flag.equals(session.getAttribute("flag"))) {
-            List<Member> list = supermarketService.getAllMembers();
-            req.setAttribute("members", list);
-            return "manager";
+        //得到session对象
+        HttpSession session = req.getSession(false);
+        if (session == null) {
+            //没有登录成功，跳转到登录页面
+            return "login";
+        }
+        //取出会话数据
+        String loginName = (String) session.getAttribute("loginName");
+        if (loginName == null) {
+            //没有登录成功，跳转到登录页面
+            return "login";
         }
         String id = req.getParameter("id");
         if (StringUtil.isEmpty(id)) {
             req.setAttribute("message", "id can not be empty ");
             return "error";
         }
-        Member mem = supermarketService.getMember(Integer.parseInt(id));
+        Member mem = superMarketService.getMember(Integer.parseInt(id));
         if (mem != null) {
             req.setAttribute("message", "The id exists");
             return "error";
@@ -120,8 +125,8 @@ public class SuperMarketController {
         }
         member.setPoints(0);
         member.setTotal(Double.parseDouble(total));
-        supermarketService.addMember(member);
-        List<Member> list = supermarketService.getAllMembers();
+        superMarketService.addMember(member);
+        List<Member> list = superMarketService.getAllMembers();
         req.setAttribute("members", list);
         session.removeAttribute("flag");
         return "manager";
@@ -146,7 +151,7 @@ public class SuperMarketController {
             return null;
         }
 
-        Member mem = supermarketService.getMember(Integer.parseInt(memberID));
+        Member mem = superMarketService.getMember(Integer.parseInt(memberID));
         String member = JSON.toJSONString(mem);
         return member;
     }
@@ -160,6 +165,18 @@ public class SuperMarketController {
      */
     @RequestMapping(path = "/back2cashier", method = RequestMethod.GET)
     public String back2cashier(HttpServletRequest req) {
+        //得到session对象
+        HttpSession session = req.getSession(false);
+        if (session == null) {
+            //没有登录成功，跳转到登录页面
+            return "login";
+        }
+        //取出会话数据
+        String loginName = (String) session.getAttribute("loginName");
+        if (loginName == null) {
+            //没有登录成功，跳转到登录页面
+            return "login";
+        }
         req.setAttribute("shoppingNum", 0);
         return "cashier";
     }
@@ -180,7 +197,7 @@ public class SuperMarketController {
             req.setAttribute("message", "Empty parameter exists");
             return "error";
         }
-        int shopNumber = supermarketService.addCommodity(commodityID, count, shoppingNumStr);
+        int shopNumber = superMarketService.addCommodity(commodityID, count, shoppingNumStr);
         if (shopNumber == 0) {
             req.setAttribute("message", "The commodity does not exist or the stock is 0");
             return "error";
@@ -188,7 +205,7 @@ public class SuperMarketController {
         Double totalCost = 0.0;
         int category = 0;
         //回显页面,先查该订单号的所有信息，
-        List<OrderItemVO> ord = supermarketService.getAllUncheck(shopNumber);
+        List<OrderItemVO> ord = superMarketService.getAllUncheck(shopNumber);
         for (OrderItemVO item1 : ord) {
             totalCost += item1.getTotal();
         }
@@ -217,11 +234,11 @@ public class SuperMarketController {
             return "error";
         }
         int ischeck = 2;
-        supermarketService.updateOrderItem(Integer.parseInt(shoppingNumStr), Integer.parseInt(commodityId), ischeck);
+        superMarketService.updateOrderItem(Integer.parseInt(shoppingNumStr), Integer.parseInt(commodityId), ischeck);
         double totalCost = 0.00;
         //回显页面
         //先查该订单号的所有信息，
-        List<OrderItemVO> ord = supermarketService.getAllUncheck(Integer.parseInt(shoppingNumStr));
+        List<OrderItemVO> ord = superMarketService.getAllUncheck(Integer.parseInt(shoppingNumStr));
         for (OrderItemVO item1 : ord) {
             totalCost += item1.getTotal();
         }
@@ -243,6 +260,18 @@ public class SuperMarketController {
      */
     @RequestMapping(path = "/getToCommodities", method = RequestMethod.POST)
     public String getToCommodities(HttpServletRequest req) {
+        //得到session对象
+        HttpSession session = req.getSession(false);
+        if (session == null) {
+            //没有登录成功，跳转到登录页面
+            return "login";
+        }
+        //取出会话数据
+        String loginName = (String) session.getAttribute("loginName");
+        if (loginName == null) {
+            //没有登录成功，跳转到登录页面
+            return "login";
+        }
         String username = req.getParameter("username");
         if (StringUtil.isEmpty(username)) {
             req.setAttribute("message", "username can not be empty");
@@ -254,17 +283,17 @@ public class SuperMarketController {
             return "error";
         }
         String role = req.getParameter("role");
-        if(StringUtil.isEmpty(role)){
+        if (StringUtil.isEmpty(role)) {
             req.setAttribute("message", "role can not be empty");
             return "error";
         }
-        User user = supermarketService.getUser(username, password);
+        User user = superMarketService.getUser(username, password);
         if (user == null) {
             req.setAttribute("message", "The user does not exist");
             return "error";
         }
-        if ( user.getRole() ==1 && user.getRole() == Integer.parseInt(role)) {
-            List<Commodity> commodity = supermarketService.getCommodities();
+        if (user.getRole() == 1 && user.getRole() == Integer.parseInt(role)) {
+            List<Commodity> commodity = superMarketService.getCommodities();
             req.setAttribute("commodities", commodity);
             return "commodity";
         }
@@ -286,7 +315,7 @@ public class SuperMarketController {
             return "error";
         }
         int Id = Integer.parseInt(id);
-        Commodity commodity = supermarketService.getCommodity(Id);
+        Commodity commodity = superMarketService.getCommodity(Id);
         List<Commodity> list = new ArrayList<>();
         list.add(commodity);
         req.setAttribute("commodityList", list);
@@ -306,7 +335,7 @@ public class SuperMarketController {
         Integer flag = new Integer(Integer.parseInt(req.getParameter("flag")));
         HttpSession session = req.getSession();
         if (!flag.equals(session.getAttribute("flag"))) {
-            List<Commodity> commodityList = supermarketService.getCommodities();
+            List<Commodity> commodityList = superMarketService.getCommodities();
             req.setAttribute("commodities", commodityList);
             return "commodity";
         }
@@ -321,8 +350,8 @@ public class SuperMarketController {
             return "error";
         }
         //判断商品是否已经存在
-        Commodity comm = supermarketService.getCommodity(Integer.parseInt(id));
-        if (comm != null){
+        Commodity comm = superMarketService.getCommodity(Integer.parseInt(id));
+        if (comm != null) {
             req.setAttribute("message", "The commodity is exists");
             return "error";
         }
@@ -333,8 +362,8 @@ public class SuperMarketController {
         commodity.setUnits(units);
         commodity.setSpecification(sp);
         commodity.setStock(Integer.parseInt(stock));
-        supermarketService.inputCommodity(commodity);
-        List<Commodity> commodityList = supermarketService.getCommodities();
+        superMarketService.inputCommodity(commodity);
+        List<Commodity> commodityList = superMarketService.getCommodities();
         req.setAttribute("commodities", commodityList);
         session.removeAttribute("flag");
         return "commodity";
@@ -353,8 +382,8 @@ public class SuperMarketController {
             req.setAttribute("message", "id can not be empty");
             return "error";
         }
-        supermarketService.deleteCommodity(Integer.parseInt(id));
-        List<Commodity> commodities = supermarketService.getCommodities();
+        superMarketService.deleteCommodity(Integer.parseInt(id));
+        List<Commodity> commodities = superMarketService.getCommodities();
         req.setAttribute("commodities", commodities);
         return "commodity";
     }
@@ -386,7 +415,7 @@ public class SuperMarketController {
             req.setAttribute("message", "Empty parameter exists");
             return "error";
         }
-        int a = supermarketService.checkoutByCash(shopNumber, total);
+        int a = superMarketService.checkoutByCash(shopNumber, total);
         if (a != 0) {
             req.setAttribute("message", "checkoutByCash service problem");
             return "error";
@@ -394,7 +423,7 @@ public class SuperMarketController {
         Double totalCost = 0.0;
         int category = 0;
         //回显页面,先查该订单号的所有信息，
-        List<OrderItemVO> ord = supermarketService.getAllChecked(Integer.parseInt(shopNumber));
+        List<OrderItemVO> ord = superMarketService.getAllChecked(Integer.parseInt(shopNumber));
         for (OrderItemVO item1 : ord) {
             totalCost += item1.getTotal();
         }
@@ -437,7 +466,7 @@ public class SuperMarketController {
             req.setAttribute("message", "Empty parameter exists");
             return "error";
         }
-        Map<String, Object> map = supermarketService.checkoutByMember(shopNumber, total, memberId);
+        Map<String, Object> map = superMarketService.checkoutByMember(shopNumber, total, memberId);
         if (map.get("error").equals(99999999)) {
             req.setAttribute("message", "shopNumber OR  memberId is 0 ");
             return "error";
@@ -445,7 +474,7 @@ public class SuperMarketController {
         Double totalCost = 0.0;
         int category = 0;
         //回显页面,先查该订单号的所有信息，
-        List<OrderItemVO> ord = supermarketService.getAllChecked(Integer.parseInt(shopNumber));
+        List<OrderItemVO> ord = superMarketService.getAllChecked(Integer.parseInt(shopNumber));
         for (OrderItemVO item1 : ord) {
             totalCost += item1.getTotal();
         }

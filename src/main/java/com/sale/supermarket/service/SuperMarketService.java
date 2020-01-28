@@ -1,6 +1,5 @@
 package com.sale.supermarket.service;
 
-
 import com.github.pagehelper.util.StringUtil;
 import com.sale.supermarket.dao.*;
 import com.sale.supermarket.pojo.*;
@@ -21,7 +20,7 @@ import java.util.Map;
  * @author aaa
  */
 @Service
-public class SupermarketService {
+public class SuperMarketService {
     @Autowired
     SuperMarketDao superMarketDao;
     @Autowired

@@ -426,8 +426,9 @@ public class SuperMarketController {
         List<OrderItemVO> ord = superMarketService.getAllChecked(Integer.parseInt(shopNumber));
         for (OrderItemVO item1 : ord) {
             totalCost += item1.getTotal();
+            category += item1.getCount();
         }
-        category = ord.size();
+//        category = ord.size();
         req.setAttribute("shoppingNum", shopNumber);
         req.setAttribute("orderItemList", ord);
         req.setAttribute("total_cost", String.valueOf(totalCost));
@@ -477,9 +478,9 @@ public class SuperMarketController {
         List<OrderItemVO> ord = superMarketService.getAllChecked(Integer.parseInt(shopNumber));
         for (OrderItemVO item1 : ord) {
             totalCost += item1.getTotal();
+            category += item1.getCount();
         }
         int totalMember = new Double(totalCost).intValue();
-        category = ord.size();
         req.setAttribute("shoppingNum", shopNumber);
         req.setAttribute("orderItemList", ord);
         req.setAttribute("total_cost", String.valueOf(totalCost));

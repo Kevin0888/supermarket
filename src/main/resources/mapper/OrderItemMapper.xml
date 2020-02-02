@@ -66,12 +66,12 @@
     <update id="update">
         update tb_order_item
         <trim prefix="set"  suffixOverrides=",">
-            <if test=" orderNumber !=null and orderNumber !='' ">order_number = #{orderNumber,jdbcType=INTEGER},</if>
+            <if test=" orderNumber != 0 ">order_number = #{orderNumber,jdbcType=INTEGER},</if>
             <if test=" commodityId != 0 ">commodity_id = #{commodityId,jdbcType=INTEGER},</if>
             <if test=" commodityName !=null and commodityName !='' ">commodity_name = #{commodityName,jdbcType=VARCHAR},</if>
-            <if test=" price !=null and price !='' ">price = #{price,jdbcType=DOUBLE},</if>
-            <if test=" count !=null and count !='' ">`count` = #{count,jdbcType=INTEGER},</if>
-            <if test=" total !=null and total !='' ">total = #{total,jdbcType=DOUBLE},</if>
+            <if test=" price != 0.0 ">price = #{price,jdbcType=DOUBLE},</if>
+            <if test=" count >= 0 ">`count` = #{count,jdbcType=INTEGER},</if>
+            <if test=" total != 0.0 ">total = #{total,jdbcType=DOUBLE},</if>
             <if test=" isChecked !=null and isChecked !='' ">is_checked = #{isChecked,jdbcType=INTEGER}</if>
         </trim>
         where
@@ -79,6 +79,16 @@
             order_number = #{orderNumber} and commodity_id = #{commodityId} and is_checked = 0
         </if>
     </update>
+    <select id="getSameOrder" resultType="com.sale.supermarket.pojo.OrderItem">
+        select
+            *
+        from
+            tb_order_item
+        where
+        <if test="shopNum != 0 ">
+            order_number = #{shopNum} and commodity_id = #{commodityId} and is_checked = 0
+        </if>
+    </select>
     <delete id="delete">
         delete
         from tb_order_item

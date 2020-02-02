@@ -39,8 +39,8 @@
             <if test=" name !=null and name !='' ">`name` = #{name, jdbcType=CHAR},</if>
             <if test=" specification !=null and specification !='' "> specification = #{specification, jdbcType=CHAR },</if>
             <if test=" units !=null and units !='' ">units = #{units, jdbcType=CHAR},</if>
-            <if test=" price !=null and price !='' ">price = #{price, jdbcType=DOUBLE},</if>
-            <if test=" stock !=null and stock !='' ">stock = #{stock,jdbcType=INTEGER}</if>
+            <if test=" price >= 0 ">price = #{price, jdbcType=DOUBLE},</if>
+            <if test=" stock >= 0">stock = #{stock,jdbcType=INTEGER}</if>
         </trim>
         where
         id = #{id, jdbcType=INTEGER} and is_delete = 0

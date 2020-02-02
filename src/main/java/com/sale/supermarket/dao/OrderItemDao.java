@@ -12,7 +12,7 @@ public interface OrderItemDao {
     void update(OrderItem param);
     List<OrderItem> get(int orderNum);
     void add(OrderItem orderItem);
-
+    OrderItem getSameOrder(@Param("shopNum") int shopNum,@Param("commodityId") int commodityId);
     List<OrderItemVO> getAllUncheck(@Param("shopNum") int shopNum);
     List<OrderItemVO> getAllChecked(@Param("shopNum") int shopNum);
 }
